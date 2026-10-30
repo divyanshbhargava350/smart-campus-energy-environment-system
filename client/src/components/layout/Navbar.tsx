@@ -90,8 +90,10 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Global Campus Selector */}
         {campuses.length > 0 && (
           <div className="hidden xl:flex items-center gap-1.5 ml-2 pl-3 border-l border-[var(--border-color)]">
-            <Building2 className="w-3.5 h-3.5 text-cyan-400" />
+            <Building2 className="w-3.5 h-3.5 text-cyan-400" aria-hidden="true" />
             <select
+              id="active-campus-selector"
+              aria-label="Active Campus Location Selector"
               value={activeCampusId}
               onChange={e => handleSwitchCampus(e.target.value)}
               className="bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg px-2.5 py-1 text-xs text-[var(--text-primary)] focus:border-cyan-400 focus:outline-none"
@@ -180,6 +182,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                 <button
                   onClick={() => { setShowUserMenu(false); onLogout(); }}
+                  aria-label="Sign out of current account"
                   className="w-full flex items-center gap-2 px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors"
                 >
                   <LogOut className="w-3.5 h-3.5" />

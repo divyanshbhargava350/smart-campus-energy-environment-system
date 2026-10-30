@@ -1736,8 +1736,11 @@ apiRouter.get('/alerts', optionalAuthMiddleware, (req: Request, res: Response) =
 
 apiRouter.post('/alerts/:id/acknowledge', optionalAuthMiddleware, (req: Request, res: Response) => {
   const authUser = (req as any).user;
-  const user = (!authUser || authUser.role === 'viewer')
-    ? { id: authUser?.id || 'OP_DEMO', name: authUser?.name ? `${authUser.name} (Operator)` : 'Campus Operational Engineer', role: 'facility_manager' }
+  if (authUser && authUser.role === 'viewer') {
+    return res.status(403).json({ success: false, message: 'Viewer role is not authorized to acknowledge alerts.' });
+  }
+  const user = !authUser
+    ? { id: 'OP_DEMO', name: 'Campus Operational Engineer', role: 'facility_manager' }
     : authUser;
 
   const data = db.getData();
@@ -1811,8 +1814,11 @@ apiRouter.post('/alerts/:id/acknowledge', optionalAuthMiddleware, (req: Request,
 
 apiRouter.post('/alerts/:id/resolve', optionalAuthMiddleware, (req: Request, res: Response) => {
   const authUser = (req as any).user;
-  const user = (!authUser || authUser.role === 'viewer')
-    ? { id: authUser?.id || 'OP_DEMO', name: authUser?.name ? `${authUser.name} (Operator)` : 'Campus Operational Engineer', role: 'facility_manager' }
+  if (authUser && authUser.role === 'viewer') {
+    return res.status(403).json({ success: false, message: 'Viewer role is not authorized to resolve faults.' });
+  }
+  const user = !authUser
+    ? { id: 'OP_DEMO', name: 'Campus Operational Engineer', role: 'facility_manager' }
     : authUser;
 
   const data = db.getData();
@@ -1846,9 +1852,15 @@ apiRouter.post('/alerts/:id/resolve', optionalAuthMiddleware, (req: Request, res
     return res.status(400).json({ success: false, message: 'Duplicate submission rejected: Alert has already been resolved.' });
   }
 
-  // Mandatory resolution note with sensible baseline default if omitted
-  const resolutionNote = (req.body?.resolutionNote || req.body?.actionTaken || req.body?.note || '').trim() ||
-    'Electrical telemetry verified and load normalized within safe operating parameters.';
+  // Mandatory resolution note validation
+  const rawNote = (req.body?.resolutionNote || req.body?.actionTaken || req.body?.note || '').trim();
+  if (!rawNote) {
+    return res.status(400).json({
+      success: false,
+      message: 'Validation Error: A mandatory resolution note describing the root cause or corrective action is required to resolve a fault.'
+    });
+  }
+  const resolutionNote = rawNote;
 
   const diagnosticNotes = (req.body?.diagnosticNotes || req.body?.rootCause || '').trim() || undefined;
   const verifiedCondition = (req.body?.verifiedCondition || '').trim() || 'Electrical telemetry restored within normal baseline parameters.';

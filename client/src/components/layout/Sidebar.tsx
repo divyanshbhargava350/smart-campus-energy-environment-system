@@ -115,6 +115,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 )}
                 <button
                   onClick={() => onSelectTab(item.id)}
+                  aria-label={`Open ${item.label} dashboard`}
+                  aria-current={isActive ? 'page' : undefined}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-all text-xs ${
                     isActive
                       ? 'bg-cyan-600 text-white shadow-sm font-semibold'

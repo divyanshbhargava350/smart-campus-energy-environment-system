@@ -302,10 +302,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             {/* Department Selection if Dept In-charge */}
             {role === 'department_hod' && (
               <div className="animate-fadeIn">
-                <label className="block text-xs font-semibold text-slate-200 mb-1">
+                <label htmlFor="assigned-department-select" className="block text-xs font-semibold text-slate-200 mb-1">
                   Assigned Department:
                 </label>
                 <select
+                  id="assigned-department-select"
+                  name="departmentId"
+                  aria-label="Assigned Academic Department"
                   value={departmentId}
                   onChange={e => setDepartmentId(e.target.value)}
                   className="w-full bg-[#0A0F1D] border border-slate-600 rounded-xl px-3 py-2 text-xs text-white focus:border-cyan-400 focus:outline-none"
