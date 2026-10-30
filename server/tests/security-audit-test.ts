@@ -526,20 +526,33 @@ async function main() {
     assert.strictEqual(authedRes.status, 201, 'Authorized device key must succeed with 201 Created');
   });
 
-  await runTest('DeepSecurity', 'XSS Sanitization: Injected HTML script tags are neutralized', async () => {
-    const res = await fetch(`${BASE_URL}/alerts/${testAlertId}/resolve`, {
+  await runTest('DeepSecurity', 'XSS Perimeter & Application Defense: Injected script tags are blocked by IDS with 403', async () => {
+    // Perimeter IDS test: raw executable script tags are blocked
+    const idsBlockedRes = await fetch(`${BASE_URL}/alerts/${testAlertId}/resolve`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${adminToken}`
       },
       body: JSON.stringify({
-        resolutionNote: '<script>alert("XSS_ATTACK")</script>Replaced faulty fuse and normalized phase load.'
+        resolutionNote: '<script>alert("XSS_ATTACK")</script>Replaced faulty fuse.'
       })
     });
-    const json = await res.json();
-    assert.strictEqual(res.status, 200);
-    assert.ok(!json.data.resolutionNote.includes('<script>'), 'Script tags must be stripped');
+    assert.strictEqual(idsBlockedRes.status, 403, 'Intrusion Detection System must block raw executable script tags with 403');
+
+    // Application Layer test: legitimate resolution notes with brackets or formatting are sanitized and stored safely
+    const legitRes = await fetch(`${BASE_URL}/alerts/${testAlertId}/resolve`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({
+        resolutionNote: 'Replaced faulty fuse [Phase A] and normalized telemetry balance.'
+      })
+    });
+    const json = await legitRes.json();
+    assert.strictEqual(legitRes.status, 200, 'Legitimate formatted resolution note must succeed');
     assert.ok(json.data.resolutionNote.includes('Replaced faulty fuse'));
   });
 
@@ -564,6 +577,119 @@ async function main() {
       headers: { 'Authorization': `Bearer ${adminToken}` }
     });
     assert.strictEqual(resUsersAdmin.status, 200, 'Super admin can access /users');
+  });
+
+  // ▶ SUITE 7: PHASE 3 ENTERPRISE SECURITY MONITORING & THREAT DEFENCE
+  console.log('\n▶ SUITE 7: Enterprise Security Monitoring, IDS & Threat Defence');
+
+  await runTest('EnterpriseIDS', 'Every HTTP response returns an enterprise X-Correlation-ID header', async () => {
+    const res = await fetch(`${BASE_URL}/health`);
+    assert.strictEqual(res.status, 200);
+    const corrId = res.headers.get('x-correlation-id');
+    assert.ok(corrId, 'Expected X-Correlation-ID header in response');
+    assert.ok(corrId.length > 8);
+  });
+
+  await runTest('EnterpriseIDS', 'SQL Injection attempt in query string is intercepted and blocked with 403', async () => {
+    const res = await fetch(`${BASE_URL}/buildings?filter=' OR '1'='1`);
+    assert.strictEqual(res.status, 403, 'SQL Injection must be blocked with 403');
+    const json = await res.json();
+    assert.strictEqual(json.success, false);
+    assert.ok(json.message.includes('Campus Intrusion Detection System') || json.message.includes('blocked'));
+  });
+
+  await runTest('EnterpriseIDS', 'XSS attack payload in request body is intercepted and blocked with 403', async () => {
+    const res = await fetch(`${BASE_URL}/assistant/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: '<script>alert(document.cookie)</script>' })
+    });
+    assert.strictEqual(res.status, 403, 'XSS payload must be blocked by IDS with 403');
+  });
+
+  await runTest('EnterpriseIDS', 'Path Traversal attempt is intercepted and blocked with 403', async () => {
+    const res = await fetch(`${BASE_URL}/uploads?file=../../etc/passwd`);
+    assert.strictEqual(res.status, 403, 'Path traversal must be blocked with 403');
+  });
+
+  await runTest('IoTThreats', 'IoT Telemetry Flooding triggers rate limit and device quarantine', async () => {
+    const floodDeviceId = `ESP32_FLOOD_${Date.now()}`;
+    let hitRateLimit = false;
+
+    // Send 18 rapid packets
+    for (let i = 0; i < 18; i++) {
+      const res = await fetch(`${BASE_URL}/pipeline/ingest`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-device-key': 'MITS_IOT_GATEWAY_KEY_2024'
+        },
+        body: JSON.stringify({
+          deviceId: floodDeviceId,
+          powerKw: 5.0,
+          energyKwh: 100 + i
+        })
+      });
+      if (res.status === 429) {
+        hitRateLimit = true;
+        break;
+      }
+    }
+    assert.strictEqual(hitRateLimit, true, 'Telemetry flooding must trigger 429 rate limit');
+
+    // Immediate next call must be quarantined (403)
+    const quarantinedRes = await fetch(`${BASE_URL}/pipeline/ingest`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-device-key': 'MITS_IOT_GATEWAY_KEY_2024'
+      },
+      body: JSON.stringify({
+        deviceId: floodDeviceId,
+        powerKw: 5.0,
+        energyKwh: 200
+      })
+    });
+    assert.strictEqual(quarantinedRes.status, 403, 'Quarantined device must be rejected with 403');
+
+    // Super Admin can restore device
+    const restoreRes = await fetch(`${BASE_URL}/security/restore-device`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({ deviceId: floodDeviceId })
+    });
+    assert.strictEqual(restoreRes.status, 200, 'Super admin can restore quarantined device');
+  });
+
+  await runTest('SIEM', 'Super Admin can access structured security logs while Viewer is denied', async () => {
+    const resViewer = await fetch(`${BASE_URL}/security/events`, {
+      headers: { 'Authorization': `Bearer ${viewerToken}` }
+    });
+    assert.strictEqual(resViewer.status, 403, 'Viewer must be denied access to SIEM logs');
+
+    const resAdmin = await fetch(`${BASE_URL}/security/events`, {
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    assert.strictEqual(resAdmin.status, 200, 'Super admin can retrieve SIEM logs');
+    const jsonAdmin = await resAdmin.json();
+    assert.strictEqual(jsonAdmin.success, true);
+    assert.ok(Array.isArray(jsonAdmin.data));
+    assert.ok(jsonAdmin.data.length > 0, 'Security logs should contain recorded events');
+    assert.ok(jsonAdmin.data[0].correlationId, 'Log event must contain correlation ID');
+  });
+
+  await runTest('SIEM', 'GET /security/stats returns active incident statistics and quarantined metrics', async () => {
+    const res = await fetch(`${BASE_URL}/security/stats`, {
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    assert.strictEqual(res.status, 200);
+    const json = await res.json();
+    assert.strictEqual(json.success, true);
+    assert.ok(typeof json.data.totalEvents === 'number');
+    assert.ok(typeof json.data.criticalEvents === 'number');
   });
 
   // SUMMARY

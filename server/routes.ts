@@ -19,6 +19,10 @@ import {
 import { 
   sanitizeInputText, validatePasswordStrength, validateIoTDeviceAuthentication 
 } from './security.js';
+import { 
+  recordSecurityEvent, getSecurityLogs, getSecurityStats, 
+  unblockIp, quarantineDevice, restoreDevice, inspectIoTTelemetry 
+} from './securityEngine.js';
 import { RegisteredUser, UserRole, CSVIngestionReport, GeneratedReportSummary, ReportPeriod, AlertResolutionHistoryItem, WaterReading, WaterTank, SustainabilityScore, DatasetMetadata } from '../shared/types.js';
 
 export const apiRouter = Router();
@@ -130,6 +134,17 @@ apiRouter.post('/auth/login', async (req: Request, res: Response) => {
     const rateKey = `${req.ip || 'ip'}_${cleanEmail}`;
     const rateCheck = checkLoginRateLimit(rateKey);
     if (!rateCheck.allowed) {
+      recordSecurityEvent({
+        eventType: 'AUTH_BRUTE_FORCE',
+        severity: 'HIGH',
+        affectedResource: '/api/auth/login',
+        identifier: cleanEmail,
+        correlationId: (req as any).correlationId,
+        detectionReason: `Multiple consecutive failed logins triggered account lockout for ${cleanEmail}`,
+        actionTaken: 'THROTTLED',
+        verificationStatus: 'CONFIRMED',
+        ipAddress: req.ip
+      });
       return res.status(429).json({
         success: false,
         message: `Too many failed login attempts. Account temporarily locked for security. Please try again in ${rateCheck.waitSeconds} seconds.`
@@ -139,18 +154,52 @@ apiRouter.post('/auth/login', async (req: Request, res: Response) => {
     const user = db.findUserByEmail(cleanEmail);
     if (!user) {
       recordFailedLogin(rateKey);
+      recordSecurityEvent({
+        eventType: 'AUTH_FAILED_ATTEMPT',
+        severity: 'MEDIUM',
+        affectedResource: '/api/auth/login',
+        identifier: cleanEmail,
+        correlationId: (req as any).correlationId,
+        detectionReason: `Authentication failed: Account not found (${cleanEmail})`,
+        actionTaken: 'FLAGGED',
+        verificationStatus: 'CONFIRMED',
+        ipAddress: req.ip
+      });
       return res.status(401).json({ success: false, message: 'Invalid academic credentials or account locked. Please verify credentials.' });
     }
 
     const valid = await verifyPassword(password, user.passwordHash);
     if (!valid) {
       recordFailedLogin(rateKey);
+      recordSecurityEvent({
+        eventType: 'AUTH_FAILED_ATTEMPT',
+        severity: 'MEDIUM',
+        affectedResource: '/api/auth/login',
+        identifier: cleanEmail,
+        correlationId: (req as any).correlationId,
+        detectionReason: `Authentication failed: Invalid password credential for ${cleanEmail}`,
+        actionTaken: 'FLAGGED',
+        verificationStatus: 'CONFIRMED',
+        ipAddress: req.ip
+      });
       return res.status(401).json({ success: false, message: 'Invalid academic credentials or account locked. Please verify credentials.' });
     }
 
     resetLoginAttempts(rateKey);
     user.lastLogin = new Date().toISOString();
     db.save();
+
+    recordSecurityEvent({
+      eventType: 'AUTH_SUCCESS',
+      severity: 'INFO',
+      affectedResource: '/api/auth/login',
+      identifier: user.id,
+      correlationId: (req as any).correlationId,
+      detectionReason: `Successful authenticated session established for ${user.email} (${user.role})`,
+      actionTaken: 'AUDITED',
+      verificationStatus: 'CONFIRMED',
+      ipAddress: req.ip
+    });
 
     db.addAuditLog({
       userId: user.id,
@@ -1061,6 +1110,15 @@ apiRouter.post('/pipeline/ingest', optionalAuthMiddleware, async (req: Request, 
     const targetMeterId = meterId || deviceId;
     if (!targetMeterId) {
       return res.status(400).json({ success: false, message: 'Device or Meter ID is required.' });
+    }
+
+    // Enterprise IoT threat inspection: verifies device quarantine, flooding, and bounds
+    const iotInspection = inspectIoTTelemetry(targetMeterId, { powerKw, voltage, currentAmps });
+    if (!iotInspection.allowed) {
+      return res.status(iotInspection.statusCode || 400).json({
+        success: false,
+        message: iotInspection.reason
+      });
     }
 
     const data = db.getData();
@@ -2510,4 +2568,47 @@ apiRouter.get('/users', authMiddleware, superAdminMiddleware, (_req: Request, re
 
 apiRouter.get('/uploads', (_req: Request, res: Response) => {
   res.json({ success: true, data: db.getData().csvImports || [] });
+});
+
+// ======================== ENTERPRISE SECURITY OPERATIONS & SIEM ========================
+apiRouter.get('/security/events', authMiddleware, superAdminMiddleware, (req: Request, res: Response) => {
+  const { severity, eventType, limit } = req.query;
+  const logs = getSecurityLogs({
+    severity: severity as any,
+    eventType: eventType as any,
+    limit: limit ? Number(limit) : 100
+  });
+  res.json({ success: true, count: logs.length, data: logs });
+});
+
+apiRouter.get('/security/stats', authMiddleware, superAdminMiddleware, (_req: Request, res: Response) => {
+  const stats = getSecurityStats();
+  res.json({ success: true, data: stats });
+});
+
+apiRouter.post('/security/unblock-ip', authMiddleware, superAdminMiddleware, (req: Request, res: Response) => {
+  const { ip } = req.body;
+  if (!ip) {
+    return res.status(400).json({ success: false, message: 'IP address is required.' });
+  }
+  const unblocked = unblockIp(ip);
+  res.json({ success: true, message: unblocked ? `IP ${ip} successfully removed from threat blocklist.` : `IP ${ip} was not actively blocked.` });
+});
+
+apiRouter.post('/security/quarantine-device', authMiddleware, facilityManagerMiddleware, (req: Request, res: Response) => {
+  const { deviceId, reason } = req.body;
+  if (!deviceId) {
+    return res.status(400).json({ success: false, message: 'Device ID is required.' });
+  }
+  quarantineDevice(deviceId, reason || 'Manual operator security quarantine');
+  res.json({ success: true, message: `Device ${deviceId} has been isolated into quarantine.` });
+});
+
+apiRouter.post('/security/restore-device', authMiddleware, facilityManagerMiddleware, (req: Request, res: Response) => {
+  const { deviceId } = req.body;
+  if (!deviceId) {
+    return res.status(400).json({ success: false, message: 'Device ID is required.' });
+  }
+  const restored = restoreDevice(deviceId);
+  res.json({ success: true, message: restored ? `Device ${deviceId} successfully restored to active monitoring.` : `Device ${deviceId} was not in quarantine.` });
 });
