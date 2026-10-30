@@ -13,6 +13,7 @@ import {
   WaterTank, WaterReading, SustainabilityScore
 } from '../shared/types.js';
 import { VERIFIED_MITS_BUILDINGS } from '../shared/campusBuildingsMetadata.js';
+import { safeWhitelist, hasPrototypePollutionKeys } from './security.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -980,9 +981,20 @@ export class CampusDatabase {
   }
 
   public updateAppliance(id: string, updates: Partial<Appliance>): Appliance | undefined {
+    if (hasPrototypePollutionKeys(updates)) {
+      throw new Error('Security Error: Illegal prototype property detected in update payload.');
+    }
     const idx = (this.data.appliances || []).findIndex(a => a.id === id);
     if (idx === -1) return undefined;
-    this.data.appliances[idx] = { ...this.data.appliances[idx], ...updates };
+
+    // Strict whitelist: protect immutable primary keys and foreign keys from Mass Assignment
+    const safeUpdates = safeWhitelist(updates, [
+      'status', 'powerWatts', 'powerKw', 'nominalWatts', 'voltage',
+      'currentAmps', 'runtimeHoursToday', 'todayKwh', 'accumulatedKwh',
+      'name', 'type'
+    ]);
+
+    this.data.appliances[idx] = { ...this.data.appliances[idx], ...safeUpdates };
     this.recalculateRoomAndBuildingPower(this.data.appliances[idx].roomId);
     this.save();
     return this.data.appliances[idx];
@@ -1032,9 +1044,19 @@ export class CampusDatabase {
   }
 
   public updateSchedule(id: string, updates: Partial<ApplianceSchedule>): ApplianceSchedule | undefined {
+    if (hasPrototypePollutionKeys(updates)) {
+      throw new Error('Security Error: Illegal prototype property detected in update payload.');
+    }
     const idx = (this.data.schedules || []).findIndex(s => s.id === id);
     if (idx === -1) return undefined;
-    this.data.schedules[idx] = { ...this.data.schedules[idx], ...updates };
+
+    // Strict whitelist: protect immutable primary keys from Mass Assignment
+    const safeUpdates = safeWhitelist(updates, [
+      'name', 'startTime', 'endTime', 'daysOfWeek', 'action',
+      'targetState', 'isActive', 'overrideUntil'
+    ]);
+
+    this.data.schedules[idx] = { ...this.data.schedules[idx], ...safeUpdates };
     this.save();
     return this.data.schedules[idx];
   }

@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
 import { Request, Response, NextFunction } from 'express';
 import { UserRole } from '../shared/types.js';
 
@@ -53,11 +54,66 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   return bcrypt.compare(password, hash);
 }
 
+// Token revocation store (token string -> expiration timestamp ms)
+const revokedTokensMap = new Map<string, number>();
+
+// Clean up expired revoked tokens every 15 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [token, exp] of revokedTokensMap.entries()) {
+    if (now > exp) {
+      revokedTokensMap.delete(token);
+    }
+  }
+}, 15 * 60 * 1000);
+
+export function revokeToken(token: string): void {
+  try {
+    const decoded: any = jwt.decode(token);
+    const expMs = decoded && decoded.exp ? decoded.exp * 1000 : Date.now() + 24 * 3600 * 1000;
+    revokedTokensMap.set(token, expMs);
+  } catch {
+    revokedTokensMap.set(token, Date.now() + 24 * 3600 * 1000);
+  }
+}
+
+export function isTokenRevoked(token: string): boolean {
+  const expMs = revokedTokensMap.get(token);
+  if (!expMs) return false;
+  if (Date.now() > expMs) {
+    revokedTokensMap.delete(token);
+    return false;
+  }
+  return true;
+}
+
+// Registration rate limiting (IP -> { count, resetAt })
+const registerAttemptsMap = new Map<string, { count: number; resetAt: number }>();
+const MAX_REGISTRATIONS_PER_WINDOW = 10;
+const REGISTRATION_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+export function checkRegisterRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = registerAttemptsMap.get(ip);
+  if (!record || now > record.resetAt) {
+    registerAttemptsMap.set(ip, { count: 1, resetAt: now + REGISTRATION_WINDOW_MS });
+    return true;
+  }
+  if (record.count >= MAX_REGISTRATIONS_PER_WINDOW) {
+    return false;
+  }
+  record.count += 1;
+  return true;
+}
+
 export function generateToken(payload: { id: string; email: string; role: UserRole; name?: string; departmentId?: string }): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  return jwt.sign({ ...payload, jti: uuidv4() }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
 
 export function verifyToken(token: string): any {
+  if (isTokenRevoked(token)) {
+    return null;
+  }
   try {
     return jwt.verify(token, JWT_SECRET);
   } catch {

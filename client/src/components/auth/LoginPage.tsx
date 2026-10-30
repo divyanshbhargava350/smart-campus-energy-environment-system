@@ -132,14 +132,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]" />
       </div>
 
-      <div className="w-full max-w-xl relative z-10 space-y-5">
+      <div className="w-full max-w-xl relative z-10 space-y-5" style={{ maxWidth: '36rem', width: '100%', margin: '0 auto' }}>
         {/* Brand Header with MITS College Logo */}
-        <header className="text-center animate-fadeIn">
+        <header className="text-center animate-fadeIn" style={{ textAlign: 'center' }}>
           <img
             src="/mits-logo.jpg"
             alt="Madhav Institute of Technology and Science, Gwalior Official Seal"
             width={96}
             height={96}
+            style={{ width: '96px', height: '96px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 12px auto' }}
             className="w-24 h-24 rounded-full border-2 border-cyan-400/50 shadow-2xl shadow-cyan-500/20 mx-auto object-cover mb-3"
             onError={(e) => {
               // Fallback if missing

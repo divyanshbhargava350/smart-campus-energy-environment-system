@@ -284,7 +284,10 @@ async function main() {
   await runTest('Pipeline', 'Valid sensor reading is normalized, validated, and persisted', async () => {
     const res = await fetch(`${BASE_URL}/pipeline/ingest`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-device-key': 'MITS_IOT_GATEWAY_KEY_2024'
+      },
       body: JSON.stringify({
         deviceId: 'ESP32_EE_METER_01',
         buildingId: 'MITS_ELECTRICAL_BLOCK',
@@ -308,7 +311,10 @@ async function main() {
   await runTest('Pipeline', 'Out-of-range sensor reading (negative power) is rejected/quarantined', async () => {
     const res = await fetch(`${BASE_URL}/pipeline/ingest`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-device-key': 'MITS_IOT_GATEWAY_KEY_2024'
+      },
       body: JSON.stringify({
         deviceId: 'ESP32_BAD_SENSOR',
         powerKw: -95.0, // Invalid physical reading
@@ -432,6 +438,109 @@ async function main() {
     assert.ok(json.data.overallIndex >= 0 && json.data.overallIndex <= 100);
     assert.ok(json.data.carbonFootprintKg.totalKg > 0);
     assert.ok(json.data.renewableSharePercent > 0);
+  });
+
+  // ▶ SUITE 6: PHASE 2 ADVANCED DEEP SECURITY HARDENING
+  console.log('▶ SUITE 6: Advanced Deep Security Hardening Verification');
+
+  await runTest('DeepSecurity', 'Registration rejects weak passwords violating modern policy', async () => {
+    const res = await fetch(`${BASE_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Weak Security User',
+        email: `weak_${Date.now()}@mits.ac.in`,
+        password: 'weak',
+        confirmPassword: 'weak',
+        role: 'viewer'
+      })
+    });
+    const json = await res.json();
+    assert.strictEqual(res.status, 400, 'Weak password must be rejected with 400');
+    assert.strictEqual(json.success, false);
+    assert.ok(json.message.includes('Password must be at least 8 characters') || json.message.includes('uppercase'));
+  });
+
+  await runTest('DeepSecurity', 'Token Revocation: Logging out invalidates JWT session on server blacklist', async () => {
+    // 1. Login to get a dedicated temporary token
+    const loginRes = await fetch(`${BASE_URL}/auth/verify-and-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fullName: 'Ephemeral Session User',
+        email: 'admin@mitsgwalior.in',
+        role: 'super_admin',
+        password: 'Admin@123'
+      })
+    });
+    const loginJson = await loginRes.json();
+    const ephemeralToken = loginJson.token;
+    assert.ok(ephemeralToken, 'Expected ephemeral token');
+
+    // 2. Verify token works initially
+    const preCheck = await fetch(`${BASE_URL}/users`, {
+      headers: { 'Authorization': `Bearer ${ephemeralToken}` }
+    });
+    assert.strictEqual(preCheck.status, 200, 'Token should work prior to revocation');
+
+    // 3. Explicitly logout
+    const logoutRes = await fetch(`${BASE_URL}/auth/logout`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${ephemeralToken}` }
+    });
+    assert.strictEqual(logoutRes.status, 200);
+
+    // 4. Token must now be rejected immediately with 401
+    const postCheck = await fetch(`${BASE_URL}/users`, {
+      headers: { 'Authorization': `Bearer ${ephemeralToken}` }
+    });
+    assert.strictEqual(postCheck.status, 401, 'Revoked token must be rejected with 401 Unauthorized');
+  });
+
+  await runTest('DeepSecurity', 'IoT Security: Unauthenticated telemetry ingestion is rejected with 401', async () => {
+    const unauthedRes = await fetch(`${BASE_URL}/pipeline/ingest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        deviceId: 'SPOOFED_IOT_SENSOR_01',
+        powerKw: 99.5,
+        energyKwh: 1200
+      })
+    });
+    assert.strictEqual(unauthedRes.status, 401, 'Unauthenticated IoT ingest must return 401');
+
+    // With authorized hardware device key, it succeeds
+    const authedRes = await fetch(`${BASE_URL}/pipeline/ingest`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-device-key': 'MITS_IOT_GATEWAY_KEY_2024'
+      },
+      body: JSON.stringify({
+        deviceId: 'ESP32_SECURE_GATEWAY_01',
+        buildingId: 'MITS_MAIN_BUILDING',
+        powerKw: 4.2,
+        energyKwh: 340.5
+      })
+    });
+    assert.strictEqual(authedRes.status, 201, 'Authorized device key must succeed with 201 Created');
+  });
+
+  await runTest('DeepSecurity', 'XSS Sanitization: Injected HTML script tags are neutralized', async () => {
+    const res = await fetch(`${BASE_URL}/alerts/${testAlertId}/resolve`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({
+        resolutionNote: '<script>alert("XSS_ATTACK")</script>Replaced faulty fuse and normalized phase load.'
+      })
+    });
+    const json = await res.json();
+    assert.strictEqual(res.status, 200);
+    assert.ok(!json.data.resolutionNote.includes('<script>'), 'Script tags must be stripped');
+    assert.ok(json.data.resolutionNote.includes('Replaced faulty fuse'));
   });
 
   await runTest('Modules', 'GET /analytics, /forecast, /buildings, /users aliases work with proper security', async () => {

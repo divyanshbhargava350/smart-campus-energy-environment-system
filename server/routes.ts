@@ -13,8 +13,12 @@ import { generateHistoricalReport } from './reportingEngine.js';
 import { 
   hashPassword, verifyPassword, generateToken, verifyToken, 
   authMiddleware, superAdminMiddleware, facilityManagerMiddleware, departmentIsolationMiddleware,
-  checkLoginRateLimit, recordFailedLogin, resetLoginAttempts, optionalAuthMiddleware, hasDepartmentAccess 
+  checkLoginRateLimit, recordFailedLogin, resetLoginAttempts, optionalAuthMiddleware, hasDepartmentAccess,
+  revokeToken, checkRegisterRateLimit
 } from './auth.js';
+import { 
+  sanitizeInputText, validatePasswordStrength, validateIoTDeviceAuthentication 
+} from './security.js';
 import { RegisteredUser, UserRole, CSVIngestionReport, GeneratedReportSummary, ReportPeriod, AlertResolutionHistoryItem, WaterReading, WaterTank, SustainabilityScore, DatasetMetadata } from '../shared/types.js';
 
 export const apiRouter = Router();
@@ -26,14 +30,27 @@ apiRouter.post('/auth/register', async (req: Request, res: Response) => {
     if (!name || !email || !password || !confirmPassword) {
       return res.status(400).json({ success: false, message: 'All fields are required.' });
     }
-    if (name.trim().length < 3) {
+
+    // Rate limit registration endpoint to prevent bot creation
+    if (!checkRegisterRateLimit(req.ip || 'ip')) {
+      return res.status(429).json({
+        success: false,
+        message: 'Too many registration requests from this source. Please wait before creating more accounts.'
+      });
+    }
+
+    const cleanName = sanitizeInputText(name.trim());
+    if (cleanName.length < 3) {
       return res.status(400).json({ success: false, message: 'Name must be at least 3 characters.' });
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ success: false, message: 'Invalid email address.' });
     }
-    if (password.length < 6) {
-      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters.' });
+
+    // Modern password policy check (8+ chars, upper, lower, digit, special)
+    const pwdStrength = validatePasswordStrength(password);
+    if (!pwdStrength.valid) {
+      return res.status(400).json({ success: false, message: pwdStrength.reason });
     }
     if (password !== confirmPassword) {
       return res.status(400).json({ success: false, message: 'Passwords do not match.' });
@@ -150,6 +167,30 @@ apiRouter.post('/auth/login', async (req: Request, res: Response) => {
   } catch (err) {
     console.error('[Auth] Login error:', err);
     res.status(500).json({ success: false, message: 'Login failed.' });
+  }
+});
+
+apiRouter.post('/auth/logout', optionalAuthMiddleware, (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      revokeToken(token);
+    }
+    const user = (req as any).user;
+    if (user) {
+      db.addAuditLog({
+        userId: user.id,
+        userName: user.name || user.email,
+        userRole: user.role,
+        action: 'USER_LOGOUT',
+        details: 'Active session terminated. JWT token explicitly revoked on server-side blacklist.'
+      });
+    }
+    return res.json({ success: true, message: 'Logged out successfully. Session revoked.' });
+  } catch (err) {
+    console.error('[Auth] Logout error:', err);
+    return res.status(500).json({ success: false, message: 'Logout failed.' });
   }
 });
 
@@ -1000,8 +1041,18 @@ apiRouter.post('/high-load/execute', authMiddleware, async (req: Request, res: R
 });
 
 // ======================== ENERGY DATA PIPELINE & CENTRALIZED STORAGE ========================
-apiRouter.post('/pipeline/ingest', async (req: Request, res: Response) => {
+apiRouter.post('/pipeline/ingest', optionalAuthMiddleware, async (req: Request, res: Response) => {
   try {
+    const isAuthedUser = !!(req as any).user;
+    const isAuthedDevice = validateIoTDeviceAuthentication(req);
+
+    if (!isAuthedUser && !isAuthedDevice) {
+      return res.status(401).json({
+        success: false,
+        message: 'Security Verification Required: Ingestion requires an authorized device key (header: x-device-key) or valid bearer session token.'
+      });
+    }
+
     const {
       deviceId, meterId, buildingId, roomId, powerKw, energyKwh,
       voltage, currentAmps, powerFactor, frequencyHz, timestamp, dataSource
@@ -1852,7 +1903,7 @@ apiRouter.post('/alerts/:id/resolve', optionalAuthMiddleware, (req: Request, res
     return res.status(400).json({ success: false, message: 'Duplicate submission rejected: Alert has already been resolved.' });
   }
 
-  // Mandatory resolution note validation
+  // Mandatory resolution note validation & XSS sanitization
   const rawNote = (req.body?.resolutionNote || req.body?.actionTaken || req.body?.note || '').trim();
   if (!rawNote) {
     return res.status(400).json({
@@ -1860,10 +1911,12 @@ apiRouter.post('/alerts/:id/resolve', optionalAuthMiddleware, (req: Request, res
       message: 'Validation Error: A mandatory resolution note describing the root cause or corrective action is required to resolve a fault.'
     });
   }
-  const resolutionNote = rawNote;
+  const resolutionNote = sanitizeInputText(rawNote);
 
-  const diagnosticNotes = (req.body?.diagnosticNotes || req.body?.rootCause || '').trim() || undefined;
-  const verifiedCondition = (req.body?.verifiedCondition || '').trim() || 'Electrical telemetry restored within normal baseline parameters.';
+  const rawDiag = (req.body?.diagnosticNotes || req.body?.rootCause || '').trim();
+  const diagnosticNotes = rawDiag ? sanitizeInputText(rawDiag) : undefined;
+  const rawCondition = (req.body?.verifiedCondition || '').trim() || 'Electrical telemetry restored within normal baseline parameters.';
+  const verifiedCondition = sanitizeInputText(rawCondition);
 
   const prevStatus = alert.status;
   alert.status = 'resolved';
