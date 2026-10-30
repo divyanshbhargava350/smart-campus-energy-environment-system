@@ -1,0 +1,301 @@
+Date,Building_Name,Energy_Consumption_kWh,Usage_Level
+2025-08-25,Hostel,382,High
+2025-03-09,Library,370,High
+2025-02-20,Hostel,363,High
+2025-12-27,Admin Office,321,Low
+2025-07-04,Hostel,354,High
+2025-10-05,Library,234,High
+2025-03-26,Admin Office,226,High
+2025-12-25,Classroom Block,137,High
+2025-05-18,Computer Lab,231,Low
+2025-07-06,Computer Lab,403,High
+2025-02-13,Computer Lab,365,Low
+2025-12-11,Computer Lab,443,High
+2025-05-29,Hostel,481,Medium
+2025-08-27,Hostel,379,Medium
+2025-03-28,Hostel,79,Medium
+2025-04-16,Classroom Block,279,High
+2025-09-20,Library,450,Medium
+2025-02-19,Classroom Block,434,Low
+2025-06-08,Classroom Block,338,Medium
+2025-02-08,Admin Office,403,Medium
+2025-06-12,Library,137,Medium
+2025-08-02,Library,466,Low
+2025-05-03,Classroom Block,76,Medium
+2025-07-11,Library,487,High
+2025-07-12,Computer Lab,225,High
+2025-06-23,Library,259,Low
+2025-06-05,Admin Office,468,Medium
+2025-02-08,Admin Office,346,Medium
+2025-01-07,Admin Office,186,Medium
+2025-06-21,Hostel,309,Low
+2025-06-02,Admin Office,368,High
+2025-09-16,Admin Office,390,High
+2025-12-21,Hostel,200,High
+2025-02-06,Computer Lab,142,Medium
+2025-05-31,Classroom Block,328,Low
+2025-11-22,Hostel,258,High
+2025-01-18,Hostel,80,High
+2025-09-12,Hostel,479,High
+2025-02-03,Admin Office,497,Medium
+2025-11-11,Library,134,High
+2025-07-25,Admin Office,342,High
+2025-08-08,Library,140,High
+2025-07-31,Library,66,Low
+2025-02-21,Library,142,High
+2025-09-01,Classroom Block,397,High
+2025-02-01,Admin Office,294,Low
+2025-07-10,Library,345,Low
+2025-05-29,Admin Office,170,Low
+2025-07-25,Computer Lab,497,Low
+2025-02-25,Admin Office,489,Low
+2025-07-23,Admin Office,181,High
+2025-04-02,Hostel,275,High
+2025-03-26,Computer Lab,345,High
+2025-05-08,Library,408,Medium
+2025-05-26,Admin Office,302,Medium
+2025-10-12,Admin Office,482,Medium
+2025-12-18,Computer Lab,172,Medium
+2025-02-20,Hostel,271,High
+2025-07-13,Hostel,322,Medium
+2025-06-23,Admin Office,441,Low
+2025-04-20,Classroom Block,431,Low
+2025-12-20,Computer Lab,356,Low
+2025-02-28,Library,108,Low
+2025-12-10,Admin Office,444,High
+2025-07-30,Library,473,Medium
+2025-10-05,Computer Lab,291,Medium
+2025-04-13,Classroom Block,415,Medium
+2025-12-28,Hostel,96,High
+2025-02-22,Classroom Block,419,High
+2025-05-27,Hostel,219,High
+2025-05-04,Classroom Block,408,Low
+2025-05-11,Hostel,140,Low
+2025-07-27,Classroom Block,421,Medium
+2025-06-18,Library,163,Low
+2025-12-14,Hostel,495,Low
+2025-11-19,Computer Lab,306,High
+2025-04-21,Admin Office,333,High
+2025-08-21,Library,124,High
+2025-12-26,Admin Office,141,Medium
+2025-09-09,Admin Office,193,High
+2025-10-02,Admin Office,118,High
+2025-05-05,Hostel,296,Low
+2025-03-30,Computer Lab,284,Medium
+2025-07-14,Admin Office,295,Low
+2025-04-02,Library,354,Low
+2025-12-21,Admin Office,301,Medium
+2025-04-05,Hostel,263,High
+2025-05-21,Computer Lab,125,Low
+2025-01-05,Admin Office,304,High
+2025-07-06,Computer Lab,81,Medium
+2025-01-08,Hostel,279,Medium
+2025-08-10,Admin Office,83,Medium
+2025-09-06,Hostel,428,High
+2025-06-10,Admin Office,349,Low
+2025-02-19,Computer Lab,329,High
+2025-06-20,Hostel,179,High
+2025-08-02,Computer Lab,207,Medium
+2025-11-27,Library,69,High
+2025-03-28,Computer Lab,290,High
+2025-11-10,Classroom Block,188,Medium
+2025-05-18,Admin Office,245,Medium
+2025-10-22,Hostel,282,Low
+2025-05-16,Admin Office,50,Low
+2025-06-08,Library,315,Low
+2025-08-19,Hostel,235,Medium
+2025-08-26,Hostel,420,High
+2025-07-16,Computer Lab,182,Medium
+2025-06-23,Library,80,Medium
+2025-04-24,Admin Office,331,Low
+2025-08-12,Classroom Block,208,Low
+2025-12-09,Library,100,Medium
+2025-05-14,Classroom Block,451,Medium
+2025-08-16,Classroom Block,215,Medium
+2025-03-19,Computer Lab,265,Low
+2025-05-10,Library,147,Low
+2025-10-28,Computer Lab,59,Low
+2025-01-03,Library,272,Medium
+2025-01-16,Computer Lab,416,Low
+2025-04-05,Admin Office,140,Medium
+2025-04-10,Classroom Block,395,High
+2025-06-07,Computer Lab,208,Low
+2025-04-16,Classroom Block,283,High
+2025-04-12,Library,341,High
+2025-03-14,Computer Lab,92,Low
+2025-04-07,Computer Lab,96,Medium
+2025-03-12,Hostel,395,High
+2025-09-18,Library,91,Medium
+2025-02-05,Hostel,124,Medium
+2025-12-17,Hostel,404,Medium
+2025-04-24,Classroom Block,224,Medium
+2025-10-17,Library,418,High
+2025-12-11,Classroom Block,307,Medium
+2025-04-06,Computer Lab,77,Low
+2025-11-29,Admin Office,488,Low
+2025-08-05,Library,343,High
+2025-06-29,Computer Lab,169,Low
+2025-06-05,Hostel,424,Low
+2025-02-08,Hostel,146,Low
+2025-01-15,Computer Lab,185,Medium
+2025-05-20,Computer Lab,68,Low
+2025-06-05,Computer Lab,164,Medium
+2025-02-25,Library,105,Low
+2025-07-30,Library,393,Medium
+2025-08-12,Hostel,233,High
+2025-07-31,Computer Lab,283,Low
+2025-01-27,Admin Office,312,Low
+2025-02-03,Admin Office,235,Medium
+2025-06-21,Library,410,High
+2025-06-02,Computer Lab,211,High
+2025-10-11,Classroom Block,405,High
+2025-08-30,Admin Office,442,Low
+2025-09-29,Hostel,446,Medium
+2025-07-08,Hostel,59,High
+2025-07-08,Computer Lab,158,High
+2025-11-07,Computer Lab,200,Medium
+2025-06-01,Classroom Block,280,Medium
+2025-12-09,Hostel,140,Medium
+2025-10-09,Admin Office,238,Medium
+2025-08-11,Computer Lab,206,Medium
+2025-03-26,Classroom Block,473,High
+2025-06-23,Classroom Block,324,Medium
+2025-11-04,Library,357,High
+2025-05-04,Admin Office,136,Low
+2025-05-31,Computer Lab,431,High
+2025-12-25,Computer Lab,295,Medium
+2025-04-24,Computer Lab,255,High
+2025-01-11,Computer Lab,455,Medium
+2025-12-28,Library,388,High
+2025-01-26,Classroom Block,473,Low
+2025-12-12,Computer Lab,122,High
+2025-02-12,Admin Office,255,Low
+2025-03-05,Computer Lab,449,Low
+2025-09-06,Library,415,Medium
+2025-04-13,Library,482,High
+2025-07-16,Classroom Block,95,Low
+2025-07-05,Hostel,201,Low
+2025-12-03,Library,115,High
+2025-10-27,Hostel,144,Medium
+2025-09-08,Computer Lab,430,Medium
+2025-11-23,Classroom Block,226,Medium
+2025-01-02,Computer Lab,449,High
+2025-01-27,Library,431,Medium
+2025-03-07,Admin Office,215,High
+2025-03-13,Admin Office,365,High
+2025-12-07,Library,112,High
+2025-12-02,Hostel,471,High
+2025-12-13,Hostel,494,Low
+2025-06-13,Admin Office,170,High
+2025-11-13,Computer Lab,99,Low
+2025-03-15,Library,384,Low
+2025-03-06,Hostel,85,High
+2025-05-30,Admin Office,170,Low
+2025-05-26,Library,334,Medium
+2025-03-14,Hostel,431,Low
+2025-07-18,Hostel,157,Low
+2025-08-22,Library,490,Medium
+2025-09-24,Classroom Block,356,High
+2025-04-02,Hostel,443,Medium
+2025-11-08,Classroom Block,161,Medium
+2025-09-21,Classroom Block,277,Medium
+2025-04-11,Hostel,277,Low
+2025-04-26,Computer Lab,374,High
+2025-01-20,Classroom Block,427,High
+2025-04-24,Classroom Block,78,High
+2025-04-07,Library,475,Low
+2025-09-27,Hostel,315,High
+2025-09-14,Library,429,Low
+2025-06-09,Classroom Block,285,High
+2025-09-02,Library,396,High
+2025-07-21,Hostel,323,Medium
+2025-10-12,Hostel,460,Low
+2025-08-22,Hostel,417,High
+2025-03-17,Library,113,High
+2025-04-25,Admin Office,177,Low
+2025-09-09,Admin Office,472,Medium
+2025-11-26,Computer Lab,122,Medium
+2025-07-10,Classroom Block,343,High
+2025-04-21,Classroom Block,148,High
+2025-03-11,Admin Office,358,Medium
+2025-07-28,Classroom Block,148,High
+2025-11-17,Library,477,Low
+2025-01-01,Computer Lab,460,High
+2025-08-03,Library,135,High
+2025-04-09,Admin Office,110,High
+2025-09-29,Admin Office,419,Medium
+2025-03-30,Hostel,83,High
+2025-12-27,Classroom Block,496,High
+2025-11-16,Computer Lab,65,Low
+2025-09-23,Library,289,Medium
+2025-01-16,Computer Lab,490,High
+2025-01-06,Classroom Block,374,Low
+2025-08-07,Library,187,Medium
+2025-11-14,Classroom Block,358,High
+2025-08-16,Hostel,130,High
+2025-04-29,Admin Office,325,Low
+2025-12-12,Admin Office,483,Low
+2025-07-13,Classroom Block,300,Medium
+2025-01-23,Hostel,488,High
+2025-11-19,Computer Lab,374,High
+2025-03-16,Hostel,204,Low
+2025-04-01,Classroom Block,111,Medium
+2025-05-28,Library,355,Medium
+2025-12-21,Classroom Block,411,High
+2025-08-25,Admin Office,299,High
+2025-07-29,Classroom Block,236,Medium
+2025-10-09,Classroom Block,443,Medium
+2025-12-14,Hostel,110,Medium
+2025-02-19,Library,90,Medium
+2025-10-21,Classroom Block,347,Low
+2025-09-12,Admin Office,393,Medium
+2025-12-26,Classroom Block,487,High
+2025-02-08,Classroom Block,75,Medium
+2025-12-24,Hostel,438,High
+2025-02-20,Admin Office,327,High
+2025-06-11,Library,410,Low
+2025-01-25,Computer Lab,98,Medium
+2025-08-24,Classroom Block,442,High
+2025-01-17,Admin Office,250,Medium
+2025-04-03,Hostel,181,Medium
+2025-11-25,Admin Office,421,High
+2025-09-29,Library,306,Low
+2025-08-17,Classroom Block,237,Low
+2025-04-03,Admin Office,138,High
+2025-02-23,Library,63,Low
+2025-04-22,Library,64,Medium
+2025-08-04,Library,239,High
+2025-07-12,Admin Office,325,High
+2025-06-18,Admin Office,103,High
+2025-08-14,Admin Office,231,High
+2025-04-20,Computer Lab,302,High
+2025-06-30,Library,250,Low
+2025-03-24,Hostel,86,Low
+2025-06-18,Library,107,Medium
+2025-03-26,Library,496,High
+2025-05-17,Library,459,Medium
+2025-01-25,Admin Office,418,High
+2025-10-08,Hostel,220,Low
+2025-08-14,Hostel,312,High
+2025-06-21,Hostel,256,Low
+2025-04-01,Hostel,266,High
+2025-12-06,Computer Lab,295,Medium
+2025-03-05,Admin Office,310,Medium
+2025-10-13,Classroom Block,497,Medium
+2025-02-17,Library,187,High
+2025-07-07,Hostel,257,Low
+2025-02-01,Computer Lab,380,High
+2025-02-01,Admin Office,354,Low
+2025-09-15,Hostel,354,Medium
+2025-04-28,Classroom Block,74,Medium
+2025-05-30,Classroom Block,339,Medium
+2025-07-16,Admin Office,334,Medium
+2025-03-21,Admin Office,328,Low
+2025-02-01,Hostel,270,Low
+2025-05-27,Classroom Block,415,High
+2025-12-14,Admin Office,355,Low
+2025-06-29,Computer Lab,462,High
+2025-08-01,Library,180,Medium
+2025-08-04,Computer Lab,441,Low
+2025-03-08,Classroom Block,100,Low
+2025-09-09,Hostel,246,Medium
