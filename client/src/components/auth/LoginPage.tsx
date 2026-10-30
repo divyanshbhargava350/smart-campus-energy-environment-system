@@ -228,6 +228,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 {/* Super Admin */}
                 <button
                   type="button"
+                  aria-label="Select role: Campus Administrator"
+                  aria-pressed={role === 'super_admin'}
                   onClick={() => handleSelectRole('super_admin')}
                   className={`p-3 rounded-xl border text-left transition-all ${
                     role === 'super_admin'
@@ -238,12 +240,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   <div className="font-bold flex items-center gap-1.5 text-xs">
                     <Shield className="w-3.5 h-3.5 text-cyan-400" /> Campus Admin
                   </div>
-                  <span className="text-[10px] text-slate-400 block mt-0.5">Full grid & relay authority</span>
+                  <span className="text-[10px] text-slate-300 block mt-0.5">Full grid & relay authority</span>
                 </button>
 
                 {/* Dept In-charge */}
                 <button
                   type="button"
+                  aria-label="Select role: Department In-Charge"
+                  aria-pressed={role === 'department_hod'}
                   onClick={() => handleSelectRole('department_hod')}
                   className={`p-3 rounded-xl border text-left transition-all ${
                     role === 'department_hod'
@@ -254,12 +258,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   <div className="font-bold flex items-center gap-1.5 text-xs">
                     <BookOpen className="w-3.5 h-3.5 text-indigo-400" /> Dept In-Charge
                   </div>
-                  <span className="text-[10px] text-slate-400 block mt-0.5">Departmental lab isolation</span>
+                  <span className="text-[10px] text-slate-300 block mt-0.5">Departmental lab isolation</span>
                 </button>
 
                 {/* Facility Manager */}
                 <button
                   type="button"
+                  aria-label="Select role: Facility Manager"
+                  aria-pressed={role === 'facility_manager'}
                   onClick={() => handleSelectRole('facility_manager')}
                   className={`p-3 rounded-xl border text-left transition-all ${
                     role === 'facility_manager'
@@ -270,12 +276,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   <div className="font-bold flex items-center gap-1.5 text-xs">
                     <Wrench className="w-3.5 h-3.5 text-amber-400" /> Facility Manager
                   </div>
-                  <span className="text-[10px] text-slate-400 block mt-0.5">Sub-meters & shedding</span>
+                  <span className="text-[10px] text-slate-300 block mt-0.5">Sub-meters & shedding</span>
                 </button>
 
                 {/* Student / Viewer */}
                 <button
                   type="button"
+                  aria-label="Select role: Student or Viewer"
+                  aria-pressed={role === 'viewer'}
                   onClick={() => handleSelectRole('viewer')}
                   className={`p-3 rounded-xl border text-left transition-all ${
                     role === 'viewer'
