@@ -98,9 +98,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   let currentSection = '';
 
   return (
-    <aside className="w-60 bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex flex-col justify-between shrink-0 overflow-y-auto">
+    <aside className="w-60 bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex flex-col justify-between shrink-0 overflow-y-auto" aria-label="Sidebar Navigation">
       <div className="p-2.5">
-        <nav className="space-y-0.5">
+        <nav className="space-y-0.5" aria-label="Campus Sections">
           {filteredItems.map((item) => {
             const isActive = activeTab === item.id;
             const showSection = item.section && item.section !== currentSection;
@@ -137,7 +137,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Dark/Light Theme Toggle */}
         <button
           onClick={onToggleTheme}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-all"
+          aria-label={isDarkMode ? "Switch to light theme" : "Switch to dark theme"}
+          title={isDarkMode ? "Switch to light theme" : "Switch to dark theme"}
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-all focus:outline-none focus:ring-1 focus:ring-cyan-400"
         >
           {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
           <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>

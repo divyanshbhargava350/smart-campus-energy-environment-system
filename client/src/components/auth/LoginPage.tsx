@@ -125,19 +125,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0F1D] flex flex-col justify-center items-center px-4 py-8 relative">
+    <main className="min-h-screen bg-[#0A0F1D] flex flex-col justify-center items-center px-4 py-8 relative">
       {/* Background radial ambient lights */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]" />
       </div>
 
       <div className="w-full max-w-xl relative z-10 space-y-5">
         {/* Brand Header with MITS College Logo */}
-        <div className="text-center animate-fadeIn">
+        <header className="text-center animate-fadeIn">
           <img
             src="/mits-logo.jpg"
-            alt="MITS Gwalior Official Logo"
+            alt="MITS Gwalior Official Institutional Seal"
             className="w-24 h-24 rounded-full border-2 border-cyan-400/50 shadow-2xl shadow-cyan-500/20 mx-auto object-cover mb-3"
             onError={(e) => {
               // Fallback if missing
@@ -147,22 +147,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           <h1 className="text-2xl font-extrabold text-white tracking-tight">
             Smart Campus Energy and Environment System
           </h1>
-          <p className="text-xs text-slate-400 mt-0.5 font-medium">
+          <p className="text-xs text-slate-300 mt-0.5 font-medium">
             Madhav Institute of Technology and Science, Gwalior (Estd. 1957)
           </p>
-          <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold shadow-sm">
+          <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-400/40 text-cyan-300 text-xs font-semibold shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
             <span>MITS Gwalior — Secure Campus Monitoring</span>
           </div>
-        </div>
+        </header>
 
         {/* Unified Verification & Login Card */}
-        <div className="bg-[#131C31] border border-slate-700/80 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-4">
+        <section aria-label="Sign In Authentication" className="bg-[#131C31] border border-slate-700/80 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-4">
           <div className="border-b border-slate-700/60 pb-3">
             <h2 className="text-base font-bold text-white flex items-center gap-2">
               <Shield className="w-4 h-4 text-cyan-400" /> Sign In to Your Account
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-300 mt-0.5">
               Enter authorized credentials or choose an evaluated demo identity
             </p>
           </div>
@@ -315,9 +315,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                       if (role === 'facility_manager') setPassword('Facility@123');
                       if (role === 'department_hod') setPassword('Hod@123');
                     }}
-                    className="text-[10px] text-cyan-400 hover:underline flex items-center gap-1"
+                    className="text-[11px] text-cyan-300 hover:text-cyan-200 hover:underline flex items-center gap-1 font-semibold"
+                    aria-label="Fill default password for selected role"
                   >
-                    <KeyRound className="w-3 h-3" /> Fill Default Password
+                    <KeyRound className="w-3.5 h-3.5" /> Fill Default Password
                   </button>
                 </div>
                 <div className="relative">
@@ -328,12 +329,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="Enter password..."
-                    className="w-full bg-[#0A0F1D] border border-slate-600 rounded-xl pl-9 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none"
+                    className="w-full bg-[#0A0F1D] border border-slate-600 rounded-xl pl-9 pr-10 py-2.5 text-xs text-white placeholder-slate-400 focus:border-cyan-400 focus:outline-none"
                   />
                   <button
                     type="button"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    title={showPassword ? 'Hide password' : 'Show password'}
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-300 hover:text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 rounded"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -365,62 +368,68 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
           {/* Quick One-Click Demo Direct Login Section */}
           <div className="pt-4 border-t border-slate-700/60 space-y-2">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block text-center">
+            <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block text-center">
               Evaluator Quick Access (Pre-Configured Demo Identities):
             </span>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button
                 type="button"
+                aria-label="One-click demo login as Campus Administrator"
                 onClick={() => handleQuickDemoLogin('admin@mits.ac.in', 'Admin@123', 'super_admin', 'Campus Administrator — Admin Demo')}
                 className="p-2 rounded-xl bg-[#0A0F1D] hover:bg-cyan-900/30 border border-slate-700 hover:border-cyan-400 text-left transition-all text-xs group"
               >
                 <div className="font-bold text-white group-hover:text-cyan-400 flex items-center gap-1 text-[11px]">
                   <Shield className="w-3 h-3 text-cyan-400" /> Admin Demo
                 </div>
-                <span className="text-[9px] text-slate-400 block mt-0.5 truncate">Campus Administrator</span>
+                <span className="text-[9px] text-slate-300 block mt-0.5 truncate">Campus Administrator</span>
               </button>
 
               <button
                 type="button"
+                aria-label="One-click demo login as Campus Facility Manager"
                 onClick={() => handleQuickDemoLogin('facility@mits.ac.in', 'Facility@123', 'facility_manager', 'Campus Facility Manager — Facility Demo')}
                 className="p-2 rounded-xl bg-[#0A0F1D] hover:bg-amber-900/30 border border-slate-700 hover:border-amber-400 text-left transition-all text-xs group"
               >
                 <div className="font-bold text-white group-hover:text-amber-400 flex items-center gap-1 text-[11px]">
                   <Wrench className="w-3 h-3 text-amber-400" /> Facility Demo
                 </div>
-                <span className="text-[9px] text-slate-400 block mt-0.5 truncate">Facility Manager</span>
+                <span className="text-[9px] text-slate-300 block mt-0.5 truncate">Facility Manager</span>
               </button>
 
               <button
                 type="button"
+                aria-label="One-click demo login as Electrical Engineering Department Head"
                 onClick={() => handleQuickDemoLogin('hod.ee@mits.ac.in', 'Hod@123', 'department_hod', 'Electrical Engineering HOD — HOD Demo')}
                 className="p-2 rounded-xl bg-[#0A0F1D] hover:bg-indigo-900/30 border border-slate-700 hover:border-indigo-400 text-left transition-all text-xs group"
               >
                 <div className="font-bold text-white group-hover:text-indigo-400 flex items-center gap-1 text-[11px]">
                   <BookOpen className="w-3 h-3 text-indigo-400" /> HOD Demo
                 </div>
-                <span className="text-[9px] text-slate-400 block mt-0.5 truncate">EE Dept Head</span>
+                <span className="text-[9px] text-slate-300 block mt-0.5 truncate">EE Dept Head</span>
               </button>
 
               <button
                 type="button"
+                aria-label="One-click demo login as Student Viewer without password"
                 onClick={() => handleQuickDemoLogin('student.viewer@mits.ac.in', 'Viewer@123', 'viewer', 'Student Viewer — Student Demo')}
                 className="p-2 rounded-xl bg-[#0A0F1D] hover:bg-emerald-900/30 border border-slate-700 hover:border-emerald-400 text-left transition-all text-xs group"
               >
                 <div className="font-bold text-white group-hover:text-emerald-400 flex items-center gap-1 text-[11px]">
                   <EyeIcon className="w-3 h-3 text-emerald-400" /> Student Demo
                 </div>
-                <span className="text-[9px] text-emerald-400 block mt-0.5 truncate">Student Viewer</span>
+                <span className="text-[9px] text-emerald-300 block mt-0.5 truncate">Student Viewer</span>
               </button>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Footer info */}
-        <p className="text-[11px] text-center text-slate-500">
-          Smart Campus Energy and Environment System • Madhav Institute of Technology and Science, Gwalior
-        </p>
+        {/* Footer landmark with high-contrast text */}
+        <footer className="text-center">
+          <p className="text-xs text-slate-300">
+            Smart Campus Energy and Environment System • Madhav Institute of Technology and Science, Gwalior
+          </p>
+        </footer>
       </div>
-    </div>
+    </main>
   );
 };

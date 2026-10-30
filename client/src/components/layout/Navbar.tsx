@@ -59,7 +59,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="flex items-center gap-3">
         <button
           onClick={onToggleMobileSidebar}
-          className="md:hidden p-1.5 rounded-lg hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)]"
+          aria-label="Toggle navigation menu"
+          className="md:hidden p-1.5 rounded-lg hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] focus:outline-none focus:ring-1 focus:ring-cyan-400"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -131,8 +132,9 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Alerts Bell */}
         <button 
           onClick={() => onNavigateToTab && onNavigateToTab('alerts')}
-          className="relative p-2 rounded-lg hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] transition-colors"
+          className="relative p-2 rounded-lg hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] transition-colors focus:outline-none focus:ring-1 focus:ring-cyan-400"
           title="Active Alerts"
+          aria-label={alertCount > 0 ? `${alertCount} active system alerts` : 'No active alerts'}
         >
           <Bell className="w-4 h-4" />
           {alertCount > 0 && (
@@ -146,7 +148,9 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-[var(--bg-tertiary)] border border-transparent hover:border-[var(--border-color)] transition-colors"
+            aria-label="User profile and account settings"
+            aria-expanded={showUserMenu}
+            className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-[var(--bg-tertiary)] border border-transparent hover:border-[var(--border-color)] transition-colors focus:outline-none focus:ring-1 focus:ring-cyan-400"
           >
             <div className="w-7 h-7 rounded-lg bg-cyan-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
               {currentUser?.name?.charAt(0)?.toUpperCase() || 'U'}
