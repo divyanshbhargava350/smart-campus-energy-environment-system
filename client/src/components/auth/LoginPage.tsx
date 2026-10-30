@@ -137,7 +137,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         <header className="text-center animate-fadeIn">
           <img
             src="/mits-logo.jpg"
-            alt="MITS Gwalior Official Institutional Seal"
+            alt="Madhav Institute of Technology and Science, Gwalior Official Seal"
+            width={96}
+            height={96}
             className="w-24 h-24 rounded-full border-2 border-cyan-400/50 shadow-2xl shadow-cyan-500/20 mx-auto object-cover mb-3"
             onError={(e) => {
               // Fallback if missing
@@ -168,7 +170,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           </div>
 
           {errorMsg && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2 animate-fadeIn">
+            <div role="alert" className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2 animate-fadeIn">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{errorMsg}</span>
             </div>
@@ -177,36 +179,42 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* 1. Full Name */}
             <div>
-              <label className="block text-xs font-semibold text-slate-200 mb-1">
+              <label htmlFor="login-full-name" className="block text-xs font-semibold text-slate-200 mb-1">
                 Your Full Name:
               </label>
               <div className="relative">
-                <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true" />
                 <input
+                  id="login-full-name"
+                  name="fullName"
                   type="text"
                   required
+                  autoComplete="name"
                   value={fullName}
                   onChange={e => setFullName(e.target.value)}
                   placeholder="e.g. Campus Officer or Student"
-                  className="w-full bg-[#0A0F1D] border border-slate-600 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none"
+                  className="w-full bg-[#0A0F1D] border border-slate-600 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-400 focus:border-cyan-400 focus:outline-none"
                 />
               </div>
             </div>
 
             {/* 2. Email Address */}
             <div>
-              <label className="block text-xs font-semibold text-slate-200 mb-1">
+              <label htmlFor="login-email" className="block text-xs font-semibold text-slate-200 mb-1">
                 Academic or Official Email:
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true" />
                 <input
+                  id="login-email"
+                  name="email"
                   type="email"
                   required
+                  autoComplete="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="admin@mits.ac.in"
-                  className="w-full bg-[#0A0F1D] border border-slate-600 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none font-mono"
+                  className="w-full bg-[#0A0F1D] border border-slate-600 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-400 focus:border-cyan-400 focus:outline-none font-mono"
                 />
               </div>
             </div>
@@ -305,7 +313,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             {role !== 'viewer' ? (
               <div className="animate-fadeIn space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <label className="text-xs font-semibold text-slate-200 flex items-center gap-1">
+                  <label htmlFor="login-password" className="text-xs font-semibold text-slate-200 flex items-center gap-1">
                     <Lock className="w-3.5 h-3.5 text-amber-400" /> Password for Privileged Access:
                   </label>
                   <button
@@ -322,8 +330,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   </button>
                 </div>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true" />
                   <input
+                    id="login-password"
+                    name="password"
+                    autoComplete="current-password"
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={password}

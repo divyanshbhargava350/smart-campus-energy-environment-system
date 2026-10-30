@@ -10573,7 +10573,7 @@
       "recurrenceCount": 2,
       "previousResolutionDate": "2026-10-28T16:30:00Z",
       "previousResolutionNotes": "Balanced 3-phase load across R-Y-B buses; recurred due to unmonitored seminar hall heater load.",
-      "lastRecurredAt": "2026-10-30T00:09:34.607Z",
+      "lastRecurredAt": "2026-10-30T03:07:26.847Z",
       "dismissReason": "Checked by electrical team",
       "reviewedBy": "Campus Operational Engineer (facility_manager)",
       "resolutionDetails": {
@@ -10648,7 +10648,7 @@
       "recurrenceCount": 3,
       "previousResolutionDate": "2026-10-24T11:15:00Z",
       "previousResolutionNotes": "Replaced RS-485 termination resistor; recurred due to cable impedance fluctuation.",
-      "lastRecurredAt": "2026-10-30T00:09:34.607Z"
+      "lastRecurredAt": "2026-10-30T03:07:26.847Z"
     },
     {
       "id": "ANO_247_1760313600",
